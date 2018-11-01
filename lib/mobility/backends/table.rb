@@ -143,6 +143,18 @@ set.
           end
         end
 
+        def translations
+          backend_cache = cache
+          super.extend(Module.new do
+            define_method :each do |&block|
+              super() do |translation|
+                backend_cache[translation.locale.to_sym] = translation
+                block.call(translation)
+              end
+            end
+          end)
+        end
+
         def clear_cache
           model_cache && model_cache.clear
         end
