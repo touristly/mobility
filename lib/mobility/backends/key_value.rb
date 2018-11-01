@@ -136,6 +136,18 @@ each translated model, or set a default option in your configuration.
           end
         end
 
+        def translations
+          backend_cache = cache
+          super.extend(Module.new do
+            define_method :each do |&block|
+              super() do |t|
+                backend_cache[t.locale.to_sym] = translation if t.key == attribute
+                block.call(translation)
+              end
+            end
+          end)
+        end
+
         def clear_cache
           @cache = {}
         end
